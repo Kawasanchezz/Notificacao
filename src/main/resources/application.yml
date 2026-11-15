@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: task-scheduler-bff
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/taskscheduler}
+    username: ${POSTGRES_USER:taskscheduler}
+    password: ${POSTGRES_PASSWORD:taskscheduler}
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/taskscheduler}
+
+app:
+  jwt:
+    # Must be at least 32 characters. Override JWT_SECRET in any real environment.
+    secret: ${JWT_SECRET:change-me-change-me-change-me-change-me}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+  viacep:
+    base-url: ${VIACEP_URL:https://viacep.com.br/ws}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
