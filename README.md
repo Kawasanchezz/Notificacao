@@ -88,3 +88,7 @@ and `MONGO_PASSWORD` are required and have no defaults.
 ## Security
 
 See [SECURITY.md](SECURITY.md) for what is protected and the known limitations.
+
+## License
+
+[MIT](LICENSE)
