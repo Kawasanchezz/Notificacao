@@ -1,37 +1,46 @@
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:17-alpine@sha256:a77aa70e641402a21411b92b721c58d10f23b50ae5fdd2333efd22d166e1e5f7
     environment:
       POSTGRES_DB: taskscheduler
-      POSTGRES_USER: taskscheduler
-      POSTGRES_PASSWORD: taskscheduler
-    ports: ["5432:5432"]
+      POSTGRES_USER: ${POSTGRES_USER:-taskscheduler}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?copy .env.example to .env and set it}
+    ports: ["127.0.0.1:${POSTGRES_PORT:-5432}:5432"]
     volumes: [postgres-data:/var/lib/postgresql/data]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U taskscheduler"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
       interval: 5s
       timeout: 3s
       retries: 10
 
   mongo:
-    image: mongo:8
-    ports: ["27017:27017"]
+    image: mongo:8@sha256:0f64db83d5926400d1cbcbaf35fbf2b0dfa6a4eaa71e04a26481a38cd803b27b
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-taskscheduler}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?copy .env.example to .env and set it}
+    ports: ["127.0.0.1:${MONGO_PORT:-27017}:27017"]
     volumes: [mongo-data:/data/db]
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD-SHELL", "mongosh --quiet -u $${MONGO_INITDB_ROOT_USERNAME} -p $${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --eval 'db.adminCommand(\"ping\")'"]
       interval: 5s
       timeout: 3s
       retries: 10
 
-  # Optional: run the BFF in Docker too -> docker compose --profile app up --build
+  # Optional: run the API in Docker too -> docker compose --profile app up --build
   app:
     profiles: ["app"]
     build: .
     ports: ["8080:8080"]
     environment:
       POSTGRES_URL: jdbc:postgresql://postgres:5432/taskscheduler
-      MONGODB_URI: mongodb://mongo:27017/taskscheduler
-      JWT_SECRET: ${JWT_SECRET:-change-me-change-me-change-me-change-me}
+      POSTGRES_USER: ${POSTGRES_USER:-taskscheduler}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?copy .env.example to .env and set it}
+      MONGODB_URI: mongodb://${MONGO_USER:-taskscheduler}:${MONGO_PASSWORD:?copy .env.example to .env and set it}@mongo:27017/taskscheduler?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:?copy .env.example to .env and set it}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
     depends_on:
       postgres: { condition: service_healthy }
       mongo: { condition: service_healthy }
