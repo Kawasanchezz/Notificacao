@@ -2,7 +2,7 @@ spring:
   application:
     name: task-scheduler-bff
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+    exclude: org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
   datasource:
     url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/taskscheduler}
     username: ${POSTGRES_USER:taskscheduler}
@@ -11,9 +11,8 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
-  data:
-    mongodb:
-      uri: ${MONGODB_URI}
+  mongodb:
+    uri: ${MONGODB_URI}
 
 app:
   jwt:

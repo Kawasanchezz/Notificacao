@@ -1,13 +1,13 @@
 package com.taskscheduler.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import com.taskscheduler.viacep.ViaCepClient;
 import com.taskscheduler.viacep.ViaCepClient.ViaCepResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -38,7 +38,7 @@ class ApiSecurityIT {
     private static final String PASSWORD = "S3cure-passw0rd"; // gitleaks:allow (test fixture, not a credential)
 
     @Autowired MockMvc mvc;
-    @Autowired ObjectMapper json;
+    @Autowired JsonMapper json;
     @MockitoBean ViaCepClient viaCep;
 
     @BeforeEach
@@ -67,12 +67,12 @@ class ApiSecurityIT {
         String email = "user-" + UUID.randomUUID() + "@example.com";
         String res = body(send("POST", "/api/auth/register", null,
                 Map.of("name", "Test User", "email", email, "password", PASSWORD)).andExpect(status().isCreated()));
-        return json.readTree(res).get("accessToken").asText();
+        return json.readTree(res).get("accessToken").asString();
     }
 
     private String createTask(String token) throws Exception {
         String res = body(send("POST", "/api/tasks", token, Map.of("title", "Pay rent")).andExpect(status().isCreated()));
-        return json.readTree(res).get("id").asText();
+        return json.readTree(res).get("id").asString();
     }
 
     @Test
