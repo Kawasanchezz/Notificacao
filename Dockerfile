@@ -5,7 +5,7 @@ RUN mvn -q -B dependency:go-offline
 COPY src ./src
 RUN mvn -q -B -DskipTests package
 
-FROM eclipse-temurin:21-jre@sha256:18bb4a91a3dea3f03ee31d3755af34dfb40f904fc77ab56cdc2f092e32fff9c2
+FROM eclipse-temurin:24-jre@sha256:8cb2387a28af84cf0db0948d9c67d4480192f4e567027a3963f145d218e8b4f2
 # The base image is pinned by digest, so OS security fixes published after that build are applied here.
 # hadolint ignore=DL3005,DL3008
 RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
