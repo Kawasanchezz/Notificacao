@@ -1,37 +1,40 @@
-# Security Policy
+# Política de Segurança
 
-## Supported versions
+## Versões suportadas
 
-Only the latest commit on `main` is supported.
+Apenas o commit mais recente da branch `main` é suportado.
 
-## Reporting a vulnerability
+## Como reportar uma vulnerabilidade
 
-Please do not open a public issue. Use GitHub's **Report a vulnerability** button (Security tab, private
-vulnerability reporting) on this repository. Include steps to reproduce and the affected endpoint or file.
-You can expect an acknowledgement within a few days; fixes are published together with the advisory.
+Não abra uma issue pública. Use o botão **Report a vulnerability** do GitHub (aba Security, relato privado de
+vulnerabilidades) neste repositório. Inclua os passos para reproduzir e o endpoint ou arquivo afetado.
+Você pode esperar uma resposta em alguns dias; as correções são publicadas junto com o aviso de segurança.
 
-## What the project does
+## O que o projeto faz
 
-- Passwords hashed with bcrypt; login takes the same path for unknown emails (no user enumeration by timing or message).
-- Stateless JWT (HMAC, issuer pinned, strict signature length), 60 minute default lifetime. The server refuses to start
-  with a missing, short or placeholder `JWT_SECRET`.
-- Every task, address and phone is looked up through its owner, so other users' objects return 404.
-- Rate limit on `/api/auth/**` (per client address), request body cap of 64 KiB, per-user caps on tasks (1000),
-  addresses (10) and phones (10), bounded page size.
-- Strict Content-Security-Policy on the bundled page, plus `nosniff`, frame denial and `no-referrer`.
-- Container runs as a non-root user with a read-only filesystem and no extra capabilities; databases listen on
-  `127.0.0.1` only and require credentials from `.env`.
+- Senhas com hash bcrypt; o login segue o mesmo caminho para e-mails inexistentes (sem enumeração de usuários por
+  tempo de resposta ou mensagem).
+- JWT sem estado (HMAC, emissor fixo, tamanho da assinatura verificado), validade padrão de 60 minutos. O servidor
+  se recusa a iniciar com um `JWT_SECRET` ausente, curto ou de exemplo.
+- Toda tarefa, endereço e telefone é buscado a partir do seu dono, então objetos de outros usuários retornam 404.
+- Limite de tentativas em `/api/auth/**` (por endereço do cliente), corpo de requisição de no máximo 64 KiB, tetos por
+  usuário de tarefas (1000), endereços (10) e telefones (10), e tamanho de página limitado.
+- Content-Security-Policy estrita na página incluída, além de `nosniff`, bloqueio de frames e `no-referrer`.
+- O contêiner roda como usuário não-root, com sistema de arquivos somente leitura e sem capacidades extras; os bancos
+  escutam apenas em `127.0.0.1` e exigem credenciais vindas do `.env`.
 
-## Known limitations
+## Limitações conhecidas
 
-- **No token revocation or refresh.** A stolen JWT works until it expires. Keep `JWT_EXPIRATION_MINUTES` short.
-- **Rate limiting is in memory and keyed by the TCP peer address.** Behind a reverse proxy every client shares the
-  proxy address, and several instances each keep their own counters. Put a gateway or WAF limiter in front for
-  production.
-- **No TLS and no HSTS in this repository.** Terminate HTTPS at a reverse proxy before exposing the API.
-- **The web page keeps the token in `sessionStorage`.** The CSP reduces XSS risk but cannot remove it.
-- **Swagger UI and `/v3/api-docs` are public.** Disable them (`springdoc.api-docs.enabled=false`,
-  `springdoc.swagger-ui.enabled=false`) for a production deployment.
-- **Schema is managed by Hibernate `ddl-auto: update`.** Move to Flyway or Liquibase migrations before production.
-- **Registration reveals whether an email exists** (409 response). Accepted to keep sign-up usable.
-- The project has had automated checks only, not an independent penetration test.
+- **Sem revogação nem renovação de token.** Um JWT roubado funciona até expirar. Mantenha `JWT_EXPIRATION_MINUTES`
+  curto.
+- **O limite de tentativas fica em memória e usa o endereço TCP de origem.** Atrás de um proxy reverso, todos os
+  clientes compartilham o endereço do proxy, e várias instâncias mantêm contadores separados. Em produção, coloque um
+  gateway ou WAF com limite na frente.
+- **Sem TLS e sem HSTS neste repositório.** Termine o HTTPS em um proxy reverso antes de expor a API.
+- **A página web guarda o token em `sessionStorage`.** A CSP reduz o risco de XSS, mas não o elimina.
+- **O Swagger UI e o `/v3/api-docs` são públicos.** Desative-os (`springdoc.api-docs.enabled=false`,
+  `springdoc.swagger-ui.enabled=false`) em um ambiente de produção.
+- **O esquema do banco é gerenciado pelo Hibernate com `ddl-auto: update`.** Migre para Flyway ou Liquibase antes de
+  ir para produção.
+- **O cadastro revela se um e-mail já existe** (resposta 409). Aceito para manter o cadastro utilizável.
+- O projeto passou apenas por verificações automatizadas, não por um teste de invasão independente.
