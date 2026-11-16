@@ -10,4 +10,7 @@ public final class Properties {
 
     @ConfigurationProperties(prefix = "app.viacep")
     public record ViaCep(String baseUrl) {}
+
+    @ConfigurationProperties(prefix = "app.limits")
+    public record Limits(int authRequestsPerMinute, int maxBodyBytes) {}
 }

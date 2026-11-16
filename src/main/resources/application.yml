@@ -1,32 +1,40 @@
 spring:
   application:
     name: task-scheduler-bff
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   datasource:
     url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/taskscheduler}
     username: ${POSTGRES_USER:taskscheduler}
-    password: ${POSTGRES_PASSWORD:taskscheduler}
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+    password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
     open-in-view: false
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/taskscheduler}
+      uri: ${MONGODB_URI}
 
 app:
   jwt:
-    # Must be at least 32 characters. Override JWT_SECRET in any real environment.
-    secret: ${JWT_SECRET:change-me-change-me-change-me-change-me}
+    # Required, at least 32 random bytes (see .env.example). There is deliberately no default.
+    secret: ${JWT_SECRET}
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
   viacep:
     base-url: ${VIACEP_URL:https://viacep.com.br/ws}
+  limits:
+    auth-requests-per-minute: ${AUTH_REQUESTS_PER_MINUTE:10}
+    max-body-bytes: 65536
 
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operations-sorter: method
+
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
 
 management:
   endpoints:

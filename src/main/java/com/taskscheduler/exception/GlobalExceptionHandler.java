@@ -1,5 +1,6 @@
 package com.taskscheduler.exception;
 
+import com.taskscheduler.exception.Exceptions.BadRequestException;
 import com.taskscheduler.exception.Exceptions.ConflictException;
 import com.taskscheduler.exception.Exceptions.ExternalServiceException;
 import com.taskscheduler.exception.Exceptions.NotFoundException;
@@ -43,6 +44,9 @@ public class GlobalExceptionHandler {
     ProblemDetail unreadable(Exception ex) {
         return problem(HttpStatus.BAD_REQUEST, "Malformed request: invalid body, parameter or enum value");
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    ProblemDetail badRequest(BadRequestException ex) { return problem(HttpStatus.BAD_REQUEST, ex.getMessage()); }
 
     @ExceptionHandler(NotFoundException.class)
     ProblemDetail notFound(NotFoundException ex) { return problem(HttpStatus.NOT_FOUND, ex.getMessage()); }

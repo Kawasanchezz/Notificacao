@@ -1,5 +1,6 @@
 package com.taskscheduler.task;
 
+import com.taskscheduler.exception.Exceptions.ConflictException;
 import com.taskscheduler.exception.Exceptions.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,12 +19,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequestMapping("/api/tasks")
 @Tag(name = "Tasks")
 @Validated
 public class TaskController {
+
+    private static final long MAX_TASKS_PER_USER = 1000;
 
     public record CreateTaskRequest(
             @NotBlank @Size(max = 200) String title,
@@ -50,12 +54,15 @@ public class TaskController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a task")
     public TaskResponse create(@AuthenticationPrincipal Long userId, @Valid @RequestBody CreateTaskRequest req) {
+        if (tasks.countByUserId(userId) >= MAX_TASKS_PER_USER) {
+            throw new ConflictException("Task limit reached (" + MAX_TASKS_PER_USER + ")");
+        }
         Task task = new Task();
         task.setUserId(userId);
         task.setTitle(req.title().trim());
         task.setDescription(req.description());
         task.setScheduledFor(req.scheduledFor());
-        task.setCreatedAt(Instant.now());
+        task.setCreatedAt(now());
         task.setUpdatedAt(task.getCreatedAt());
         return TaskResponse.from(tasks.save(task));
     }
@@ -86,7 +93,7 @@ public class TaskController {
                                      @Valid @RequestBody UpdateStatusRequest req) {
         Task task = find(userId, id);
         task.setStatus(req.status());
-        task.setUpdatedAt(Instant.now());
+        task.setUpdatedAt(now());
         return TaskResponse.from(tasks.save(task));
     }
 
@@ -96,6 +103,9 @@ public class TaskController {
     public void delete(@AuthenticationPrincipal Long userId, @PathVariable String id) {
         tasks.delete(find(userId, id));
     }
+
+    /** MongoDB stores milliseconds; truncating keeps the API response identical to what is persisted. */
+    private static Instant now() { return Instant.now().truncatedTo(ChronoUnit.MILLIS); }
 
     /** Scoped by owner: another user's task is reported as 404, never leaked. */
     private Task find(Long userId, String id) {

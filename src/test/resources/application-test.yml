@@ -1,0 +1,6 @@
+# Integration tests need PostgreSQL and MongoDB (see README); credentials come from the environment.
+app:
+  jwt:
+    secret: test-only-signing-key-0123456789-abcdefghijklmnop
+  limits:
+    auth-requests-per-minute: 100000

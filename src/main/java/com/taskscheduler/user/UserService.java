@@ -1,5 +1,6 @@
 package com.taskscheduler.user;
 
+import com.taskscheduler.exception.Exceptions.ConflictException;
 import com.taskscheduler.exception.Exceptions.NotFoundException;
 import com.taskscheduler.user.UserDtos.*;
 import com.taskscheduler.viacep.ViaCepClient;
@@ -11,6 +12,9 @@ import java.util.List;
 @Service
 @Transactional
 public class UserService {
+
+    private static final int MAX_ADDRESSES = 10;
+    private static final int MAX_PHONES = 10;
 
     private final UserRepository users;
     private final ViaCepClient viaCep;
@@ -38,6 +42,9 @@ public class UserService {
 
     public AddressResponse addAddress(Long userId, AddressRequest req) {
         User user = find(userId);
+        if (user.getAddresses().size() >= MAX_ADDRESSES) {
+            throw new ConflictException("Address limit reached (" + MAX_ADDRESSES + ")");
+        }
         Address address = new Address();
         address.setUser(user);
         apply(address, req);
@@ -78,6 +85,9 @@ public class UserService {
 
     public PhoneResponse addPhone(Long userId, PhoneRequest req) {
         User user = find(userId);
+        if (user.getPhones().size() >= MAX_PHONES) {
+            throw new ConflictException("Phone limit reached (" + MAX_PHONES + ")");
+        }
         Phone phone = new Phone();
         phone.setUser(user);
         phone.setNumber(req.number());
