@@ -10,7 +10,7 @@ centralized JWT security. It also serves a small web page so the API can be trie
 
 ## Tech stack
 
-Java 21, Spring Boot 3.5 (Web, Security, Validation, Data JPA, Data MongoDB, Actuator), jjwt, springdoc-openapi,
+Java 21, Spring Boot 4.0 (Web MVC, Security, Validation, Data JPA, Data MongoDB, Actuator), jjwt, springdoc-openapi,
 Docker Compose, JUnit 5 and MockMvc.
 
 ## Architecture

@@ -35,7 +35,3 @@ You can expect an acknowledgement within a few days; fixes are published togethe
 - **Schema is managed by Hibernate `ddl-auto: update`.** Move to Flyway or Liquibase migrations before production.
 - **Registration reveals whether an email exists** (409 response). Accepted to keep sign-up usable.
 - The project has had automated checks only, not an independent penetration test.
-- **Two open advisories in `spring-webmvc` 6.2.19** (CVE-2026-47884, `XsltView`; CVE-2026-47890, SSE with view fragments).
-  Both are rated Critical and are fixed only in Spring Framework 7 (Spring Boot 4); 6.2.19 is the latest 6.2 release.
-  The code uses neither XSLT views nor server-sent events nor server-side view rendering, so the vulnerable paths are not
-  reachable today. Plan: migrate to Spring Boot 4.
