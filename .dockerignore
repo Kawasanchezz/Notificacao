@@ -1,0 +1,15 @@
+# Build context hygiene: keep secrets, VCS data and local tooling out of the image build.
+**/.git
+**/.github
+**/.env
+**/.env.*
+!**/.env.example
+**/*.pem
+**/*.key
+**/.audit
+**/.claude
+**/.vscode
+**/.idea
+**/target
+**/*.md
+**/docker-compose*.yml

@@ -5,3 +5,34 @@ target/
 
 # --- audit working files ---
 .audit/
+
+# --- secrets and keys (.env.example stays tracked) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+
+# --- AI assistant data ---
+.claude/
+.claude.json
+CLAUDE*.md
+.mcp*.json
+.cursor/
+.windsurf/
+.aider*
+.codex/
+.gemini/
+.specstory/
+.cline*
+.roo*
+.kiro/
+
+# --- logs, dumps, OS, IDE ---
+*.log
+*.dump
+*.sql.gz
+.DS_Store
+Thumbs.db
